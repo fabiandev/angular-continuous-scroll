@@ -1,15 +1,15 @@
-(function() {
+(function () {
   'use strict';
 
   angular.module('dc.endlessScroll')
 
-    /**
-     * @member dc.endlessScroll.endlessScroll
-     *
-     * @description
-     * A directive for implementing an endless scrolling list.
-     */
-    .directive('endlessScroll', function($window, $timeout) {
+  /**
+   * @member dc.endlessScroll.endlessScroll
+   *
+   * @description
+   * A directive for implementing an endless scrolling list.
+   */
+    .directive('endlessScroll', function ( $window, $timeout ) {
       var NG_REPEAT_REGEXP = /^\s*(.+)\s+in\s+([\r\n\s\S]*?)\s*(\s+track\s+by\s+(.+)\s*)?$/;
 
       /**
@@ -22,27 +22,27 @@
        * @description
        * Return a function that only gets executed once within a given time period.
        */
-      function throttle(fn, delay) {
+      function throttle ( fn, delay ) {
         var timeout,
             previous = 0;
 
-        return function() {
-          var current = new Date().getTime(),
+        return function () {
+          var current   = new Date().getTime(),
               remaining = delay - (current - previous),
-              args = arguments;
+              args      = arguments;
 
           if (remaining <= 0) {
             if (timeout) {
               $timeout.cancel(timeout);
             }
 
-            timeout = undefined;
+            timeout  = undefined;
             previous = current;
 
             fn.apply(this, args);
-          } else if (!timeout) {
-            timeout = $timeout(function() {
-              timeout = undefined;
+          } else if (! timeout) {
+            timeout = $timeout(function () {
+              timeout  = undefined;
               previous = new Date().getTime();
 
               fn.apply(this, args);
@@ -61,13 +61,13 @@
        * Parse ngRepeat expression and
        * return the name of the loop variable, the collection and tracking expression
        */
-      function parseNgRepeatExp(expression) {
+      function parseNgRepeatExp ( expression ) {
         var matches = expression.match(NG_REPEAT_REGEXP);
 
         return {
-          item: matches[1],
-          collection: matches[2],
-          trackBy: matches[3]
+          item: matches[ 1 ],
+          collection: matches[ 2 ],
+          trackBy: matches[ 3 ]
         };
       }
 
@@ -81,22 +81,27 @@
        * The controller of endlessScroll directive.
        * Each directive creates an instance of EndlessScroller.
        */
-      function EndlessScroller(scope, element, attrs) {
+      function EndlessScroller ( scope, element, attrs ) {
         var defaultOptions = {
-          scrollOffset: -100,
+          scrollOffset: - 100,
           scrollThrottle: 300
         };
 
         // Priviledged properties
-        this.scope = scope;
-        this.attrs = attrs;
-        this.element = $(element);
-        this.options = angular.extend({}, defaultOptions, this.scope.$eval(this.attrs.endlessScrollOptions));
-        this.docWindow = $($window);
-        this.window = this.options.window ? $(this.options.window) : this.docWindow;
-        this.dimension = { window: {}, parent: {}, items: [] };
-        this.status = {};
-        this.expression = parseNgRepeatExp(this.attrs.endlessScroll);
+        this.scope             = scope;
+        this.attrs             = attrs;
+        this.element           = $(element);
+        this.options           = angular.extend({}, defaultOptions, this.scope.$eval(this.attrs.endlessScrollOptions));
+        this.docWindow         = $($window);
+        this.window            = this.options.window ? $(this.options.window) : this.docWindow;
+        this.dimension         = { window: {}, parent: {}, items: [] };
+        this.status            = {};
+        this.expression        = parseNgRepeatExp(this.attrs.endlessScroll);
+        this.placeholder       = null;
+        this.placeholderBottom = null;
+        this.initialPage       = parseInt(this.scope.initialPage || '1', 10);
+        this.totalPages        = parseInt(this.scope.totalPages || '1', 10);
+        this.currentPage       = this.initialPage;
 
         // Watch for events and scope changes
         this._watch();
@@ -109,7 +114,7 @@
        * Check to see if more items need to be fetched
        * by checking if the user has scrolled to the bottom or top.
        */
-      EndlessScroller.prototype.check = function() {
+      EndlessScroller.prototype.check = function () {
         // Determine if scrolling up or down and if we reach the end of list or not
         angular.extend(this.status, this._getScrollStatus());
 
@@ -124,13 +129,13 @@
 
         // If scrolled to bottom, request more items
         if (this.status.isEndReached && this.status.isScrollingDown &&
-            this.dimension.parent.bottom + this.options.scrollOffset <= this.dimension.window.bottom) {
+          this.dimension.parent.bottom + this.options.scrollOffset <= this.dimension.window.bottom) {
           this.next();
         }
 
         // If scrolled to top, request more items
         if (this.status.isStartReached && this.status.isScrollingUp &&
-            this.dimension.parent.top - this.options.scrollOffset >= this.dimension.window.top) {
+          this.dimension.parent.top - this.options.scrollOffset >= this.dimension.window.top) {
           this.previous();
         }
       };
@@ -141,8 +146,8 @@
        * @description
        * Request the next page of items by notifying its parent controller.
        */
-      EndlessScroller.prototype.next = function() {
-        if (!this.status.isPendingNext) {
+      EndlessScroller.prototype.next = function () {
+        if (! this.status.isPendingNext) {
           this._setPending('next', true);
 
           // Notify parent scope
@@ -156,8 +161,8 @@
        * @description
        * Request the previous page of items by notifying its parent controller.
        */
-      EndlessScroller.prototype.previous = function() {
-        if (!this.status.isPendingPrevious) {
+      EndlessScroller.prototype.previous = function () {
+        if (! this.status.isPendingPrevious) {
           this._setPending('previous', true);
 
           // Notify parent scope
@@ -172,7 +177,7 @@
        * @description
        * Insert new items before or after a list of existing items and render them.
        */
-      EndlessScroller.prototype.update = function(collection) {
+      EndlessScroller.prototype.update = function ( collection ) {
         var beforeItems,
             afterItems,
             firstCommonItemIndex,
@@ -190,16 +195,16 @@
         // Get new items
         if (angular.isArray(collection) && angular.isArray(oldCollection)) {
           // Find first common item index
-          for (i = 0, len = collection.length; i < len; i++) {
-            if (collection[i] === oldCollection[0] && collection[i] !== undefined) {
+          for (i = 0, len = collection.length; i < len; i ++) {
+            if (collection[ i ] === oldCollection[ 0 ] && collection[ i ] !== undefined) {
               firstCommonItemIndex = i;
               break;
             }
           }
 
           // Find last common item index
-          for (i = collection.length - 1; i >= 0; i--) {
-            if (collection[i] === oldCollection[oldCollection.length - 1] && collection[i] !== undefined) {
+          for (i = collection.length - 1; i >= 0; i --) {
+            if (collection[ i ] === oldCollection[ oldCollection.length - 1 ] && collection[ i ] !== undefined) {
               lastCommonItemIndex = i;
               break;
             }
@@ -215,27 +220,31 @@
         }
 
         // Add to items
-        if (!angular.isArray(this.items) || this.items.length === 0) {
+        if (! angular.isArray(this.items) || this.items.length === 0) {
           if (angular.isArray(collection)) {
             this.items = collection.slice();
           }
         } else {
           if (beforeItems) {
+            // TODO: remove workaround and improve dimension items <-> original items mapping
             this.items.unshift.apply(this.items, beforeItems);
+            this.dimension.items.unshift.apply(this.dimension.items, new Array(beforeItems.length));
           }
 
           if (afterItems) {
             this.items.push.apply(this.items, afterItems);
           }
         }
-
+        console.log('beforeItems', beforeItems ? beforeItems.length : undefined);
+        console.log('afterItems', afterItems ? afterItems.length : undefined);
+        console.log('items', this.items ? this.items.length : undefined);
         // Previous collection
         if (angular.isArray(collection)) {
           this.previousOriginalItems = collection.slice();
         }
 
         // Flag status
-        $timeout(angular.bind(this, function() {
+        $timeout(angular.bind(this, function () {
           this._setPending('next', false);
           this._setPending('previous', false);
 
@@ -253,7 +262,8 @@
        * Remove items which are not visible in the viewport from DOM
        * and re-insert them when they become visible again.
        */
-      EndlessScroller.prototype.clean = function() {
+      EndlessScroller.prototype.clean = function () {
+        console.log('clean');
         var firstVisibleItemIndex,
             lastVisibleItemIndex,
             defaultPlaceholderAttrs,
@@ -273,16 +283,20 @@
         // Determine dimension of each repeated element
         this.dimension.items = this._getDimension('items');
 
+        console.log('dimension.items', this.dimension.items.length);
+        console.log('originalItems', this.originalItems.length);
+
         if (this.dimension.items && this.originalItems &&
-            this.dimension.items.length === this.originalItems.length) {
+          this.dimension.items.length === this.originalItems.length) {
           // Determine tag name
-          children = this._getChildren();
+
+          children    = this._getChildren();
           itemTagName = children.get(0) && children.prop('tagName').toLowerCase();
 
           // Determine first and last visible item
-          angular.forEach(this.dimension.items, function(dimension, itemIndex) {
+          angular.forEach(this.dimension.items, function ( dimension, itemIndex ) {
             var isVisible = dimension.bottom >= this.dimension.window.top - this.dimension.window.height &&
-                            dimension.top <= this.dimension.window.bottom + this.dimension.window.height;
+              dimension.top <= this.dimension.window.bottom + this.dimension.window.height;
 
             // Set reference to item index
             if (isVisible) {
@@ -295,7 +309,7 @@
           }, this);
 
           // Create placeholder
-          if (!this.placeholder && itemTagName) {
+          if (! this.placeholder && itemTagName) {
             this.placeholder = $('<' + itemTagName + '>');
 
             // Insert placeholder before all items
@@ -304,24 +318,42 @@
               .prependTo(parent);
           }
 
+          // Create bottom placeholder
+          if (! this.placeholderBottom) {
+            this.placeholderBottom = $('<' + itemTagName + '>');
+
+            // Set clear both style
+            defaultPlaceholderAttrs.clear = 'both';
+
+            // Insert placeholder after all items
+            this.placeholderBottom
+              .css(defaultPlaceholderAttrs)
+              .appendTo(parent);
+          }
+
           // Calculate total space occupied by items before the first visible item
           if (this.placeholder) {
             if (angular.isDefined(firstVisibleItemIndex)) {
-              placeholderHeight = this.dimension.items[firstVisibleItemIndex].top - this.dimension.parent.top;
+              placeholderHeight = this.dimension.items[ firstVisibleItemIndex ].top - this.dimension.parent.top;
             } else {
               placeholderHeight = 0;
             }
 
             this.placeholder.height(placeholderHeight);
           }
-
           // Add to items
-          if (angular.isDefined(firstVisibleItemIndex) &&
-              angular.isDefined(lastVisibleItemIndex) &&
-              angular.isArray(this.items) &&
-              angular.isArray(this.originalItems)) {
+          if (angular.isDefined(firstVisibleItemIndex) && angular.isDefined(lastVisibleItemIndex) && angular.isArray(this.items) && angular.isArray(this.originalItems)) {
             newItems = this.originalItems.slice(firstVisibleItemIndex, lastVisibleItemIndex + 1);
-            this.items.splice.apply(this.items, [0, this.items.length].concat(newItems));
+            this.items.splice.apply(this.items, [ 0, this.items.length ].concat(newItems));
+
+            var currentPage  = this.currentPage;
+            this.totalPages  = Math.ceil(this.originalItems.length / this.scope.pagination.perPage);
+            this.currentPage = Math.ceil(firstVisibleItemIndex / 20) + this.scope.initialPage;
+
+            if (currentPage !== this.currentPage) {
+              this.scope.$emit('endlessScroll:updatePage', this);
+            }
+
           }
         }
       };
@@ -333,14 +365,29 @@
        * @description
        * Watch for changes to scope properties and events fired by the scope and DOM
        */
-      EndlessScroller.prototype._watch = function() {
+      EndlessScroller.prototype._watch = function () {
         var collectionExp = this.expression.collection;
 
         if (collectionExp) {
           // Watch for data changes
-          this.scope.$watchCollection(collectionExp, angular.bind(this, function watchCollection() {
+          this.scope.$watchCollection(collectionExp, angular.bind(this, function watchCollection () {
             this.update.apply(this, arguments);
           }));
+
+          // Watch placholder height to adjust bottom placeholder
+          this.scope.$watch(
+            angular.bind(this, function watchPlaceholder () {
+              return this.placeholder ? this.placeholder.height() : 0;
+            }),
+            angular.bind(this, function watchPlaceholderDiff ( newValue, oldValue ) {
+              if (newValue !== oldValue) {
+                var diff   = newValue - oldValue,
+                    height = this.placeholderBottom.height() - diff;
+
+                this.placeholderBottom.height(height < 0 ? 0 : height);
+              }
+            })
+          );
 
           // Watch for onScroll event
           this.window.on('scroll', this._boundOnScroll = angular.bind(this, this._onScroll));
@@ -357,7 +404,7 @@
        * @description
        * Watch for changes to scope properties and events fired by the scope and DOM
        */
-      EndlessScroller.prototype._unwatch = function() {
+      EndlessScroller.prototype._unwatch = function () {
         if (this._boundOnScroll) {
           this.window.off('scroll', this._boundOnScroll);
         }
@@ -372,21 +419,21 @@
        * @description
        * Set a flag to indicate if the directive is pending for more items.
        */
-      EndlessScroller.prototype._setPending = function(type, bool) {
+      EndlessScroller.prototype._setPending = function ( type, bool ) {
         var attr = 'isPending' + type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
 
-        this.status[attr] = angular.isUndefined(bool) ? true : !!bool;
-        this.timeouts = this.timeouts || {};
+        this.status[ attr ] = angular.isUndefined(bool) ? true : ! ! bool;
+        this.timeouts       = this.timeouts || {};
 
-        if (this.status[attr]) {
-          if (this.timeouts[attr]) {
-            $timeout.cancel(this.timeouts[attr]);
-            delete this.timeouts[attr];
+        if (this.status[ attr ]) {
+          if (this.timeouts[ attr ]) {
+            $timeout.cancel(this.timeouts[ attr ]);
+            delete this.timeouts[ attr ];
           }
 
           // Automatically set the wait status to false after a time period
-          this.timeouts[attr] = $timeout(angular.bind(this, function() {
-            this.status[attr] = false;
+          this.timeouts[ attr ] = $timeout(angular.bind(this, function () {
+            this.status[ attr ] = false;
           }), 5000);
         }
       };
@@ -398,10 +445,10 @@
        * @description
        * An event handler for scrolling.
        */
-      EndlessScroller.prototype._onScroll = function() {
-        this.scope.$apply(angular.bind(this, function() {
+      EndlessScroller.prototype._onScroll = function () {
+        this.scope.$apply(angular.bind(this, function () {
           // Define a throttled check method, if it's not already defined
-          if (!this._throttledCheck) {
+          if (! this._throttledCheck) {
             this._throttledCheck = throttle(angular.bind(this, this.check), this.options.scrollThrottle);
           }
 
@@ -418,8 +465,8 @@
        * @description
        * Find the parent element of the directive and return it.
        */
-      EndlessScroller.prototype._getParent = function() {
-        if (!this._parent || !this._parent.get(0)) {
+      EndlessScroller.prototype._getParent = function () {
+        if (! this._parent || ! this._parent.get(0)) {
           this._parent = this.element.parent();
         }
 
@@ -434,7 +481,7 @@
        * @description
        * Get the offset top of an element
        */
-      EndlessScroller.prototype._getOffsetTop = function(element) {
+      EndlessScroller.prototype._getOffsetTop = function ( element ) {
         var offset = element.offset();
 
         if (this.window.get(0) === $window) {
@@ -449,13 +496,13 @@
        * @protected
        * @param {string} type
        */
-      EndlessScroller.prototype._getDimension = function(type) {
+      EndlessScroller.prototype._getDimension = function ( type ) {
         var height,
             top,
             bottom,
             parent = this._getParent();
 
-        switch(type) {
+        switch (type) {
           case 'window':
             height = this.window.outerHeight();
             top    = this.window.scrollTop();
@@ -463,7 +510,7 @@
 
             return {
               height: height,
-              top:    top,
+              top: top,
               bottom: bottom
             };
 
@@ -474,7 +521,7 @@
 
             return {
               height: height,
-              top:    top,
+              top: top,
               bottom: bottom
             };
 
@@ -483,16 +530,16 @@
                 items = this.dimension.items.slice();
 
             this._getChildren()
-              .each(angular.bind(this, function(i, child) {
-                child = $(child);
-                height = child.outerHeight();
-                top = child.get(0) && this._getOffsetTop(child);
-                bottom = top + height;
-                itemIndex = $.inArray(child.scope()[this.expression.item], this.originalItems);
+              .each(angular.bind(this, function ( i, child ) {
+                child     = $(child);
+                height    = child.outerHeight();
+                top       = child.get(0) && this._getOffsetTop(child);
+                bottom    = top + height;
+                itemIndex = $.inArray(child.scope()[ this.expression.item ], this.originalItems);
 
                 // Set reference to the dimension of each visible element
-                if (itemIndex > -1) {
-                  items[itemIndex] = {
+                if (itemIndex > - 1) {
+                  items[ itemIndex ] = {
                     height: height,
                     top: top,
                     bottom: bottom
@@ -509,23 +556,23 @@
        * @protected
        * @returns {Object} An object containing information about the scroll status of the directive element.
        */
-      EndlessScroller.prototype._getScrollStatus = function() {
+      EndlessScroller.prototype._getScrollStatus = function () {
         var windowTop = this.window.scrollTop(),
-            status = {};
+            status    = {};
 
         if (this.dimension.window.top > 0) {
-          status.isScrollingUp = windowTop - this.dimension.window.top < 0;
+          status.isScrollingUp   = windowTop - this.dimension.window.top < 0;
           status.isScrollingDown = windowTop - this.dimension.window.top > 0;
         } else {
-          status.isScrollingUp = false;
+          status.isScrollingUp   = false;
           status.isScrollingDown = true;
         }
 
         if (angular.isArray(this.items) && angular.isArray(this.originalItems)) {
-          status.isEndReached = this.items[this.items.length - 1] === this.originalItems[this.originalItems.length - 1];
-          status.isStartReached = this.items[0] === this.originalItems[0];
+          status.isEndReached   = this.items[ this.items.length - 1 ] === this.originalItems[ this.originalItems.length - 1 ];
+          status.isStartReached = this.items[ 0 ] === this.originalItems[ 0 ];
         } else {
-          status.isEndReached = true;
+          status.isEndReached   = true;
           status.isStartReached = false;
         }
 
@@ -537,7 +584,7 @@
        * @protected
        * @returns The child elements of the directive element. It is the list of items which are currently rendered in DOM.
        */
-      EndlessScroller.prototype._getChildren = function() {
+      EndlessScroller.prototype._getChildren = function () {
         var selector = '[ng-repeat]';
 
         return this._getParent().children(selector);
@@ -551,7 +598,7 @@
        * @description
        * The template of endlessScroll directive.
        */
-      function EndlessScrollerTemplate(element, attrs) {
+      function EndlessScrollerTemplate ( element, attrs ) {
         this.html = this._create(element, attrs);
       }
 
@@ -559,7 +606,7 @@
        * @function dc.endlessScroll.EndlessScrollerTemplate#toString
        * @returns {String} The template element as HTML string
        */
-      EndlessScrollerTemplate.prototype.toString = function() {
+      EndlessScrollerTemplate.prototype.toString = function () {
         return this.html;
       };
 
@@ -572,13 +619,13 @@
        * @description
        * Create a template element for the directive.
        */
-      EndlessScrollerTemplate.prototype._create = function(element, attrs) {
+      EndlessScrollerTemplate.prototype._create = function ( element, attrs ) {
         var elementAttrs = Array.prototype.slice.call(element.prop('attributes'), 0),
-            parsedExp = parseNgRepeatExp(attrs.endlessScroll),
-            ngRepeatExp = parsedExp.item + ' in _endlessScroll.items' + (parsedExp.trackBy ? ' ' + parsedExp.trackBy : '');
+            parsedExp    = parseNgRepeatExp(attrs.endlessScroll),
+            ngRepeatExp  = parsedExp.item + ' in _endlessScroll.items' + (parsedExp.trackBy ? ' ' + parsedExp.trackBy : '');
 
         // Remove all element attributes as 'replace' already copies over these attributes
-        angular.forEach(elementAttrs, function(attr) {
+        angular.forEach(elementAttrs, function ( attr ) {
           element.removeAttr(attr.name);
         });
 
@@ -593,11 +640,11 @@
         scope: true,
         replace: true,
 
-        template: function(element, attrs) {
+        template: function ( element, attrs ) {
           return (new EndlessScrollerTemplate(element, attrs)).toString();
         },
 
-        controller: function($scope, $element, $attrs) {
+        controller: function ( $scope, $element, $attrs ) {
           var endlessScroll = new EndlessScroller($scope, $element, $attrs);
 
           $scope._endlessScroll = endlessScroll;
