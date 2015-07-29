@@ -1,25 +1,23 @@
-[ng-cloak] {
-  display: none;
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
 }
 
 .container {
-  padding-top: 30px;
-  padding-bottom: 30px;
-  max-width: 750px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    max-width: 750px;
 }
 
 .thumbnail .caption {
-  font-size: 13px;
-  font-weight: normal;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+    font-size: 13px;
+    font-weight: normal;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .thumbnail .image {
-  height: 210px;
-  background-position: 50% 50%;
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-color: #000;
+    height: 210px;
+    background-size: 100%;
+    background: #000 no-repeat 50% 50%;
 }

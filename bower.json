@@ -7,19 +7,21 @@
     "name": "Fabian Pirklbauer",
     "email": "hi@fabianweb.net"
   },
-  "homepage": "http://fabianweb.net",
+  "homepage": "https://github.com/fabianweb/angular-continuous-scroll",
   "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
     "docs",
+    "example",
     "src",
     "test",
     "Gruntfile.js",
     "karma.conf.js",
     "bower.json",
-    "package.json"
+    "package.json",
+    "server.js"
   ],
   "dependencies": {
     "angular": ">=1.2.13",
