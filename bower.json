@@ -1,13 +1,13 @@
 {
-  "name": "angular-endless-scroll",
+  "name": "angular-continuous-scroll",
   "version": "0.0.5",
-  "main": "./build/angular-endless-scroll.js",
-  "description": "Endless scrolling for AngularJS",
+  "main": "./build/angular-continuous-scroll.js",
+  "description": "Continuous scrolling for AngularJS",
   "author": {
-    "name": "David Chin",
-    "email": "davidchin.yf@gmail.com"
+    "name": "Fabian Pirklbauer",
+    "email": "hi@fabianweb.net"
   },
-  "homepage": "http://davidchin.me",
+  "homepage": "http://fabianweb.net",
   "license": "MIT",
   "ignore": [
     "**/.*",
@@ -22,10 +22,10 @@
     "package.json"
   ],
   "dependencies": {
-    "angular": ">=1.2.6",
+    "angular": ">=1.2.13",
     "jquery": ">=1.9.0"
   },
   "devDependencies": {
-    "angular-mocks": "~1.2.13"
+    "angular-mocks": ">=1.2.13"
   }
 }

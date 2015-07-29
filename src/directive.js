@@ -1,15 +1,15 @@
 (function () {
   'use strict';
 
-  angular.module('dc.endlessScroll')
+  angular.module('fw.continuousScroll')
 
   /**
-   * @member dc.endlessScroll.endlessScroll
+   * @member fw.continuousScroll.continuousScroll
    *
    * @description
    * A directive for implementing an endless scrolling list.
    */
-    .directive('endlessScroll', function ( $window, $timeout ) {
+    .directive('continuousScroll', function ( $window, $timeout ) {
       var NG_REPEAT_REGEXP = /^\s*(.+)\s+in\s+([\r\n\s\S]*?)\s*(\s+track\s+by\s+(.+)\s*)?$/;
 
       /**
@@ -83,25 +83,30 @@
        */
       function EndlessScroller ( scope, element, attrs ) {
         var defaultOptions = {
-          scrollOffset: - 100,
-          scrollThrottle: 300
+          offset: - 100,
+          throttle: 300,
+          perPage: 20,
+          initialPage: 1
         };
 
         // Priviledged properties
         this.scope             = scope;
         this.attrs             = attrs;
         this.element           = $(element);
-        this.options           = angular.extend({}, defaultOptions, this.scope.$eval(this.attrs.endlessScrollOptions));
+        this.options           = angular.extend({}, defaultOptions, this.scope.$eval(this.attrs.scrollOpts));
         this.docWindow         = $($window);
         this.window            = this.options.window ? $(this.options.window) : this.docWindow;
         this.dimension         = { window: {}, parent: {}, items: [] };
         this.status            = {};
-        this.expression        = parseNgRepeatExp(this.attrs.endlessScroll);
+        this.expression        = parseNgRepeatExp(this.attrs.continuousScroll);
         this.placeholder       = null;
         this.placeholderBottom = null;
-        this.initialPage       = parseInt(this.scope.initialPage || '1', 10);
-        this.totalPages        = parseInt(this.scope.totalPages || '1', 10);
+        this.initialPage       = parseInt(this.scope.initialPage || this.options.initialPage, 10);
+        this.loadedPages       = 1;
+        this.perPage           = parseInt(this.scope.perPage || this.options.perPage, 10);
         this.currentPage       = this.initialPage;
+        this.updatedDefault    = { unshifted: false, unshiftedCount: 0, pushed: false, pushedCount: 0 };
+        this.updated           = this.updatedDefault;
 
         // Watch for events and scope changes
         this._watch();
@@ -129,13 +134,13 @@
 
         // If scrolled to bottom, request more items
         if (this.status.isEndReached && this.status.isScrollingDown &&
-          this.dimension.parent.bottom + this.options.scrollOffset <= this.dimension.window.bottom) {
+          this.dimension.parent.bottom + this.options.offset <= this.dimension.window.bottom) {
           this.next();
         }
 
         // If scrolled to top, request more items
         if (this.status.isStartReached && this.status.isScrollingUp &&
-          this.dimension.parent.top - this.options.scrollOffset >= this.dimension.window.top) {
+          this.dimension.parent.top - this.options.offset >= this.dimension.window.top) {
           this.previous();
         }
       };
@@ -151,7 +156,7 @@
           this._setPending('next', true);
 
           // Notify parent scope
-          this.scope.$emit('endlessScroll:next', this);
+          this.scope.$emit('scroller.page:next', this);
         }
       };
 
@@ -166,7 +171,7 @@
           this._setPending('previous', true);
 
           // Notify parent scope
-          this.scope.$emit('endlessScroll:previous', this);
+          this.scope.$emit('scroller.page:previous', this);
         }
       };
 
@@ -226,18 +231,31 @@
           }
         } else {
           if (beforeItems) {
-            // TODO: remove workaround and improve dimension items <-> original items mapping
             this.items.unshift.apply(this.items, beforeItems);
+
+            // Add placeholders for new items to the top of the dimension array
             this.dimension.items.unshift.apply(this.dimension.items, new Array(beforeItems.length));
+
+            // Adjust the initial page
+            if (this.initialPage > 1) {
+              $timeout(angular.bind(this, function() {
+                this.initialPage--;
+              }));
+            }
           }
 
           if (afterItems) {
             this.items.push.apply(this.items, afterItems);
           }
         }
-        console.log('beforeItems', beforeItems ? beforeItems.length : undefined);
-        console.log('afterItems', afterItems ? afterItems.length : undefined);
-        console.log('items', this.items ? this.items.length : undefined);
+
+        this.updated = {
+          unshifted: !!beforeItems,
+          unshiftedCount: beforeItems ? beforeItems.length : 0,
+          pushed: !!afterItems,
+          pushedCount: afterItems ? afterItems.length : 0,
+        };
+
         // Previous collection
         if (angular.isArray(collection)) {
           this.previousOriginalItems = collection.slice();
@@ -263,7 +281,6 @@
        * and re-insert them when they become visible again.
        */
       EndlessScroller.prototype.clean = function () {
-        console.log('clean');
         var firstVisibleItemIndex,
             lastVisibleItemIndex,
             defaultPlaceholderAttrs,
@@ -271,7 +288,8 @@
             itemTagName,
             newItems,
             children,
-            parent = this._getParent();
+            parent = this._getParent(),
+            i;
 
         // Set default placeholder attrs
         defaultPlaceholderAttrs = {
@@ -283,8 +301,19 @@
         // Determine dimension of each repeated element
         this.dimension.items = this._getDimension('items');
 
-        console.log('dimension.items', this.dimension.items.length);
-        console.log('originalItems', this.originalItems.length);
+        // Correct offsets of non visible items after items were added to the top
+        if (this.updated && this.updated.unshifted === true) {
+          var firstNewItem = this.dimension.items[0];
+          var lastNewItem = this.dimension.items[this.updated.unshiftedCount - 1];
+
+          var top = firstNewItem.top * -1 + lastNewItem.top;
+          var bottom = firstNewItem.bottom * -1 + lastNewItem.bottom;
+
+          for (i = this.items.length - 1; i < this.dimension.items.length; i++) {
+            this.dimension.items[i].top += top;
+            this.dimension.items[i].bottom += bottom;
+          }
+        }
 
         if (this.dimension.items && this.originalItems &&
           this.dimension.items.length === this.originalItems.length) {
@@ -347,15 +376,17 @@
             this.items.splice.apply(this.items, [ 0, this.items.length ].concat(newItems));
 
             var currentPage  = this.currentPage;
-            this.totalPages  = Math.ceil(this.originalItems.length / this.scope.pagination.perPage);
-            this.currentPage = Math.ceil(firstVisibleItemIndex / 20) + this.scope.initialPage;
+            this.loadedPages  = Math.ceil(this.originalItems.length / this.perPage);
+            this.currentPage = Math.round(firstVisibleItemIndex / 20) + this.initialPage;
 
             if (currentPage !== this.currentPage) {
-              this.scope.$emit('endlessScroll:updatePage', this);
+              this.scope.$emit('scroller.page:update', this);
             }
 
           }
         }
+
+        this.updated = this.updatedDefault;
       };
 
       /**
@@ -449,7 +480,7 @@
         this.scope.$apply(angular.bind(this, function () {
           // Define a throttled check method, if it's not already defined
           if (! this._throttledCheck) {
-            this._throttledCheck = throttle(angular.bind(this, this.check), this.options.scrollThrottle);
+            this._throttledCheck = throttle(angular.bind(this, this.check), this.options.throttle);
           }
 
           // Check if there's a need to fetch more data
@@ -621,7 +652,7 @@
        */
       EndlessScrollerTemplate.prototype._create = function ( element, attrs ) {
         var elementAttrs = Array.prototype.slice.call(element.prop('attributes'), 0),
-            parsedExp    = parseNgRepeatExp(attrs.endlessScroll),
+            parsedExp    = parseNgRepeatExp(attrs.continuousScroll),
             ngRepeatExp  = parsedExp.item + ' in _endlessScroll.items' + (parsedExp.trackBy ? ' ' + parsedExp.trackBy : '');
 
         // Remove all element attributes as 'replace' already copies over these attributes

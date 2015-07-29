@@ -1,0 +1,25 @@
+[ng-cloak] {
+  display: none;
+}
+
+.container {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  max-width: 750px;
+}
+
+.thumbnail .caption {
+  font-size: 13px;
+  font-weight: normal;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.thumbnail .image {
+  height: 210px;
+  background-position: 50% 50%;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-color: #000;
+}

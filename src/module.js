@@ -6,10 +6,10 @@
    */
 
   /**
-   * @module dc.endlessScroll
+   * @module fw.continuousScroll
    *
    * @description
    * A module for implementing an endless/infinite scroll user interface.
    */
-  angular.module('dc.endlessScroll', []);
+  angular.module('fw.continuousScroll', []);
 })();

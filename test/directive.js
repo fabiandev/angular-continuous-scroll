@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  describe('endlessScroll directive', function() {
+  describe('continuousScroll directive', function() {
     var parentScope,
         parentElement,
         directive,
@@ -9,7 +9,7 @@
         html;
 
     beforeEach(function() {
-      module('dc.endlessScroll');
+      module('fw.continuousScroll');
 
       inject(function($rootScope) {
         parentScope = $rootScope.$new();
@@ -23,7 +23,7 @@
         { name: 'Coco'   }
       ];
 
-      html = '<div endless-scroll="cat in cats"></div>';
+      html = '<div continuous-scroll="cat in cats"></div>';
 
       parentElement = $('<div></div>');
 
@@ -49,7 +49,7 @@
 
       return {
         element:    element,
-        controller: repeatElement.controller('endlessScroll'),
+        controller: repeatElement.controller('continuousScroll'),
         scope:      repeatElement.scope()
       };
     }
@@ -86,18 +86,18 @@
       });
 
       it('should be configurable using HTML attributes', function() {
-        expect(directive.controller.options.scrollOffset).toEqual(-100);
+        expect(directive.controller.options.offset).toEqual(-100);
 
-        html = '<div endless-scroll="cat in cats" endless-scroll-options="{ scrollOffset: -200 }"></div>';
+        html = '<div continuous-scroll="cat in cats" scroll-opts="{ offset: -200 }"></div>';
         directive = compile(html);
 
-        expect(directive.controller.options.scrollOffset).toEqual(-200);
+        expect(directive.controller.options.offset).toEqual(-200);
       });
 
       it('should assign the browser window as the default window object', inject(function($window) {
         expect(directive.controller.window).toEqual($($window));
 
-        html = '<div endless-scroll="cat in cats" endless-scroll-options="{ window: \'#sidebar\' }"></div>';
+        html = '<div continuous-scroll="cat in cats" scroll-opts="{ window: \'#sidebar\' }"></div>';
         directive = compile(html);
 
         expect(directive.controller.window).toEqual($('#sidebar'));
@@ -255,11 +255,11 @@
 
         directive.controller.status.isPendingNext = false;
         directive.controller.next();
-        expect(directive.controller.scope.$emit).toHaveBeenCalledWith('endlessScroll:next', directive.controller);
+        expect(directive.controller.scope.$emit).toHaveBeenCalledWith('scroller.page:next', directive.controller);
 
         directive.controller.status.isPendingPrevious = false;
         directive.controller.previous();
-        expect(directive.controller.scope.$emit).toHaveBeenCalledWith('endlessScroll:previous', directive.controller);
+        expect(directive.controller.scope.$emit).toHaveBeenCalledWith('scroller.page:previous', directive.controller);
       });
 
       it('should not request data if its pending for results', function() {
@@ -267,11 +267,11 @@
 
         directive.controller.status.isPendingNext = true;
         directive.controller.next();
-        expect(directive.controller.scope.$emit).not.toHaveBeenCalledWith('endlessScroll:next', directive.controller);
+        expect(directive.controller.scope.$emit).not.toHaveBeenCalledWith('scroller.page:next', directive.controller);
 
         directive.controller.status.isPendingPrevious = true;
         directive.controller.previous();
-        expect(directive.controller.scope.$emit).not.toHaveBeenCalledWith('endlessScroll:previous', directive.controller);
+        expect(directive.controller.scope.$emit).not.toHaveBeenCalledWith('scroller.page:previous', directive.controller);
       });
     });
 

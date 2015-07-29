@@ -9,6 +9,7 @@ module.exports = function (grunt) {
             ' * <%= pkg.name %>.js v<%= pkg.version %>\n' +
             ' * <%= pkg.homepage %>\n' +
             ' * Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n' +
+            ' * Based on angular-endless-scroll.js by David Chin\n' +
             ' * <%= pkg.license %> License\n' +
             ' */\n',
 
@@ -28,7 +29,7 @@ module.exports = function (grunt) {
       }
     },
 
-    ngmin: {
+    ngAnnotate: {
       dist: {
         src: 'build/<%= pkg.name %>.js',
         dest: 'build/<%= pkg.name %>.min.js'
@@ -111,12 +112,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-bump');
-  grunt.loadNpmTasks('grunt-ngmin');
+  grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-jsdoc');
 
   // Register custom tasks
   grunt.registerTask('test', ['karma']);
-  grunt.registerTask('build', ['jshint', 'clean:dist', 'concat', 'ngmin', 'uglify']);
+  grunt.registerTask('build', ['jshint', 'clean:dist', 'concat', 'ngAnnotate', 'uglify']);
   grunt.registerTask('docs', ['clean:docs', 'jsdoc']);
 };
