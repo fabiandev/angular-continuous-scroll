@@ -1,12 +1,20 @@
 {
   "name": "angular-continuous-scroll",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "./build/angular-continuous-scroll.js",
-  "description": "Continuous scrolling for AngularJS",
-  "author": {
-    "name": "Fabian Pirklbauer",
-    "email": "hi@fabianweb.net"
-  },
+  "description": "Infinite scrolling for AngularJS with pagination",
+  "authors": [
+    {
+      "name": "Fabian Pirklbauer",
+      "email": "hi@fabianweb.net",
+      "homepage": "http://fabianweb.net"
+    },
+    {
+      "name": "David Chin",
+      "email": "davidchin.yf@gmail.com",
+      "homepage": "http://davidchin.me"
+    }
+  ],
   "homepage": "https://github.com/fabianweb/angular-continuous-scroll",
   "license": "MIT",
   "ignore": [
