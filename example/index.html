@@ -27,14 +27,14 @@
         <div class="row">
             <div data-continuous-scroll="post in posts" data-scroll-opts="{offset: -150, throttle: 300, perPage: 20}"
                  class="col-md-4">
-                <a data-ng-href="{{ post.post_url }}" class="thumbnail">
-                    <div data-ng-style="{ 'background-image': 'url(' + post.photos[0].alt_sizes[3].url + ')' }"
+                <a data-ng-href="{{ ::post.post_url }}" class="thumbnail">
+                    <div data-ng-style="::{ 'background-image': 'url(' + post.photos[0].alt_sizes[3].url + ')' }"
                          class="image"></div>
                     <div class="caption text-center">
-            <span data-ng-show="post.post_author">
-              {{ post.post_author }}
+            <span data-ng-show="::post.post_author">
+              {{ ::post.post_author }}
             </span>
-            <span data-ng-hide="post.post_author">
+            <span data-ng-hide="::post.post_author">
               N/A
             </span>
                     </div>
