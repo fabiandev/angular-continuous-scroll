@@ -1,8 +1,8 @@
 /*!
- * angular-continuous-scroll.js v0.0.5
+ * angular-continuous-scroll.js v0.1.1
  * https://github.com/fabianweb/angular-continuous-scroll
- * Original work Copyright 2014 David Chin * Modified work Copyright 2015 Fabian Pirklbauer
- * Based on angular-endless-scroll.js by David Chin
+ * Original work Copyright 2014 David Chin
+ * Modified work Copyright 2015 Fabian Pirklbauer
  * MIT License
  */
 (function () {

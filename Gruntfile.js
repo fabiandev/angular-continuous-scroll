@@ -8,9 +8,8 @@ module.exports = function (grunt) {
     banner: '/*!\n' +
             ' * <%= pkg.name %>.js v<%= pkg.version %>\n' +
             ' * <%= pkg.homepage %>\n' +
-            ' * Original work Copyright 2014 David Chin' +
-            ' * Modified work Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n' +
-            ' * Based on angular-endless-scroll.js by David Chin\n' +
+            ' * Original work Copyright 2014 <%= pkg.authors[1].name %>\n' +
+            ' * Modified work Copyright <%= grunt.template.today("yyyy") %> <%= pkg.authors[0].name %>\n' +
             ' * <%= pkg.license %> License\n' +
             ' */\n',
 

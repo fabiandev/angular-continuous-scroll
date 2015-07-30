@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
 Original work Copyright 2014 David Chin
+
 Modified work Copyright 2015 Fabian Pirklbauer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

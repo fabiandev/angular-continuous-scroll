@@ -1,6 +1,6 @@
 {
   "name": "angular-continuous-scroll",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "./build/angular-continuous-scroll.js",
   "description": "Infinite scrolling for AngularJS with pagination",
   "authors": [
