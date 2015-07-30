@@ -387,8 +387,13 @@
             placeholderBottomHeight = 0;
           }
 
-          this.placeholder.height(placeholderHeight);
-          this.placeholderBottom.height(placeholderBottomHeight);
+          if (this.placeholder) {
+            this.placeholder.height(placeholderHeight);
+          }
+
+          if (this.placeholderBottom) {
+            this.placeholderBottom.height(placeholderBottomHeight);
+          }
 
           // Add to items
           if (firstVisibleItemIndex !== undefined && lastVisibleItemIndex !== undefined &&

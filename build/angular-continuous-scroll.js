@@ -1,5 +1,5 @@
 /*!
- * angular-continuous-scroll.js v0.1.2
+ * angular-continuous-scroll.js v0.1.3
  * https://github.com/fabianweb/angular-continuous-scroll
  * Original work Copyright 2014 David Chin
  * Modified work Copyright 2015 Fabian Pirklbauer
@@ -410,8 +410,13 @@
             placeholderBottomHeight = 0;
           }
 
-          this.placeholder.height(placeholderHeight);
-          this.placeholderBottom.height(placeholderBottomHeight);
+          if (this.placeholder) {
+            this.placeholder.height(placeholderHeight);
+          }
+
+          if (this.placeholderBottom) {
+            this.placeholderBottom.height(placeholderBottomHeight);
+          }
 
           // Add to items
           if (firstVisibleItemIndex !== undefined && lastVisibleItemIndex !== undefined &&
