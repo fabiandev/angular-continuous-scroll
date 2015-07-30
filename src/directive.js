@@ -330,6 +330,7 @@
         var firstVisibleItemIndex,
             lastVisibleItemIndex,
             placeholderHeight,
+            placeholderBottomHeight,
             newItems,
             i;
 
@@ -338,11 +339,10 @@
 
         // Correct offsets of non visible items after items were added to the top
         if (this.updated.unshifted === true) {
-          var firstNewItem = this.dimension.items[ 0 ];
-          var lastNewItem  = this.dimension.items[ this.updated.unshiftedCount - 1 ];
-
-          var top    = firstNewItem.top * -1 + lastNewItem.top;
-          var bottom = firstNewItem.bottom * -1 + lastNewItem.bottom;
+          var firstNewItem = this.dimension.items[ 0 ],
+              lastNewItem  = this.dimension.items[ this.updated.unshiftedCount - 1 ],
+              top          = firstNewItem.top * -1 + lastNewItem.top,
+              bottom       = firstNewItem.bottom * -1 + lastNewItem.bottom;
 
           for (i = this.items.length - 1; i < this.dimension.items.length; i++) {
             this.dimension.items[ i ].top += top;
@@ -380,7 +380,15 @@
             placeholderHeight = 0;
           }
 
+          // Calculate total space occupied by items after the last visible item
+          if (lastVisibleItemIndex !== undefined) {
+            placeholderBottomHeight = this.dimension.items[this.dimension.items.length - 1].bottom - this.dimension.items[ lastVisibleItemIndex ].bottom;
+          } else {
+            placeholderBottomHeight = 0;
+          }
+
           this.placeholder.height(placeholderHeight);
+          this.placeholderBottom.height(placeholderBottomHeight);
 
           // Add to items
           if (firstVisibleItemIndex !== undefined && lastVisibleItemIndex !== undefined &&
@@ -400,6 +408,7 @@
           }
         }
 
+        // Reset info about added items
         this.updated = this.updatedDefault;
       };
 
@@ -418,29 +427,6 @@
           this.scope.$watchCollection(collectionExp, angular.bind(this, function() {
             this.update.apply(this, arguments);
           }));
-
-          // Watch placholder height to adjust bottom placeholder
-          this.scope.$watch(
-            angular.bind(this, function() {
-              return this.placeholder ? this.placeholder.height() : 0;
-            }),
-            angular.bind(this, function( newValue, oldValue ) {
-              // TODO: fix issue when reaching eof
-
-              if (this.status.isEndReached) {
-                console.log('endisreached');
-                this.placeholderBottom.height(0);
-                return;
-              }
-
-              if (newValue !== oldValue) {
-                var diff   = newValue - oldValue,
-                    height = this.placeholderBottom.height() - diff;
-
-                this.placeholderBottom.height(height < 0 ? 0 : height);
-              }
-            })
-          );
 
           // Watch for onScroll event
           this.window.on('scroll', this._boundOnScroll = angular.bind(this, this._onScroll));

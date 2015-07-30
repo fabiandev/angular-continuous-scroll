@@ -138,10 +138,12 @@
       }
 
       // Scope methods
-      $scope.nextPage = function nextPage () {
+      $scope.nextPage = function nextPage (event) {
         $scope.loading = true;
 
         postLoader.next().then(onPageLoad, onPageLoadError);
+
+        event.preventDefault();
       };
 
       $scope.previousPage = function previousPage (event) {

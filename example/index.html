@@ -43,10 +43,14 @@
         </div>
 
         <p data-ng-show="pagination.totalPages" class="text-center text-muted">
-      <span data-ng-show="loading">
-        Loading...
-      </span>
-            {{ pagination.lastPage }} / {{ pagination.totalPages }}
+      <ul class="nav nav-pills">
+            <li role="presentation">
+                <a data-ng-show="pagination.lastPage < pagination.totalPages" data-ng-href="?page={{ pagination.lastPage + 1 }}" data-ng-click="nextPage($event)">
+                    <span data-ng-hide="loading">Load Page {{ pagination.lastPage + 1 }} / {{ pagination.totalPages }}</span>
+                    <span data-ng-show="loading">Loading...</span>
+                </a>
+            </li>
+        </ul>
         </p>
     </div>
 </section>
